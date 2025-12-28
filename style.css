@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel CientiFitness - Registro</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,400;0,700;1,900&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="logo-container">
+            <img src="LOGO.jpg" alt="Logo CientiFitness" class="logo-img">
+            <h1>CIENTI<span class="text-blue">FITNESS</span> <span class="subtitle">MANAGER</span></h1>
+        </div>
+    </nav>
+
+    <div class="container">
+        <section class="card form-section">
+            <h2><span class="icon">⚛</span> Nuevo Asesorado</h2>
+            <form id="clientForm">
+                <div class="form-group">
+                    <label>Nombre Completo</label>
+                    <input type="text" id="nombre" placeholder="Ej. Juan Pérez" required>
+                </div>
+                <div class="form-group">
+                    <label>Objetivo</label>
+                    <select id="objetivo">
+                        <option value="Hipertrofia">Hipertrofia</option>
+                        <option value="Definición">Definición (Pérdida de Grasa)</option>
+                        <option value="Fuerza">Fuerza / Powerlifting</option>
+                        <option value="Recomposición">Recomposición Corporal</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Tipo de Plan</label>
+                    <select id="plan">
+                        <option value="Entrenamiento">Solo Entrenamiento</option>
+                        <option value="Nutrición">Solo Nutrición</option>
+                        <option value="Completo">Pack Completo (Entreno + Dieta)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Fecha de Inicio</label>
+                    <input type="date" id="fecha" required>
+                </div>
+                <button type="submit" class="btn-primary">REGISTRAR CLIENTE</button>
+            </form>
+        </section>
+
+        <section class="card list-section">
+            <h2>Base de Datos de Clientes</h2>
+            <div class="table-responsive">
+                <table id="clientTable">
+                    <thead>
+                        <tr>
+                            <th>Nombre</th>
+                            <th>Objetivo</th>
+                            <th>Plan</th>
+                            <th>Inicio</th>
+                            <th>Estado</th>
+                            <th>Acción</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        </tbody>
+                </table>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        const form = document.getElementById('clientForm');
+        const tableBody = document.querySelector('#clientTable tbody');
+
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Capturar datos
+            const nombre = document.getElementById('nombre').value;
+            const objetivo = document.getElementById('objetivo').value;
+            const plan = document.getElementById('plan').value;
+            const fecha = document.getElementById('fecha').value;
+
+            // Crear fila
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td><strong>${nombre}</strong></td>
+                <td>${objetivo}</td>
+                <td><span class="badge badge-blue">${plan}</span></td>
+                <td>${fecha}</td>
+                <td><span class="status-active">Activo</span></td>
+                <td><button class="btn-delete" onclick="this.parentElement.parentElement.remove()">Eliminar</button></td>
+            `;
+
+            tableBody.appendChild(row);
+            form.reset();
+            alert("Cliente registrado con éxito bajo metodología científica.");
+        });
+    </script>
+</body>
+</html>
