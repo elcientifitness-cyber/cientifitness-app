@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>ElCientifitness</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* ESTILOS VISUALES */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Inter', sans-serif; background: linear-gradient(135deg, #e8f4f5 0%, #f5e8f4 50%, #f4f5e8 100%); min-height: 100vh; min-height: 100dvh; padding: 20px; display: flex; flex-direction: column; }
+    .container { max-width: 800px; margin: 0 auto; background: white; border-radius: 20px; box-shadow: 0 10px 40px rgba(33, 128, 141, 0.1); overflow: hidden; width: 100%; }
+    .header { background: linear-gradient(135deg, #21808d 0%, #32b8c6 100%); color: white; padding: 30px 20px; text-align: center; position: relative; }
+    .header h1 { font-size: 26px; font-weight: 700; }
+    .admin-btn { position: absolute; top: 15px; right: 15px; background: rgba(255,255,255,0.25); color: white; border: none; padding: 8px 12px; border-radius: 8px; cursor: pointer; font-size: 18px; }
+    .content { padding: 30px 20px; }
+    .progress-bar { display: flex; justify-content: space-between; margin-bottom: 30px; position: relative; }
+    .progress-bar::before { content: ''; position: absolute; top: 15px; left: 0; right: 0; height: 2px; background: #e0e0e0; z-index: 0; }
+    .progress-fill { position: absolute; top: 15px; left: 0; height: 2px; background: #21808d; transition: width 0.3s; z-index: 1; }
+    .step { width: 32px; height: 32px; border-radius: 50%; background: white; border: 2px solid #e0e0e0; display: flex; align-items: center; justify-content: center; font-weight: 600; color: #999; position: relative; z-index: 2; transition: 0.3s; }
+    .step.active { border-color: #21808d; background: #21808d; color: white; transform: scale(1.1); }
+    .step.completed { border-color: #21808d; background: #21808d; color: white; }
+    .form-section { display: none; animation: fadeIn 0.4s; }
+    .form-section.active { display: block; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    .form-group { margin-bottom: 20px; }
+    .form-label { display: block; font-size: 14px; font-weight: 600; color: #134252; margin-bottom: 8px; }
+    .form-input { width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 10px; font-size: 16px; font-family: inherit; }
+    .form-input:focus { outline: none; border-color: #21808d; }
+    .form-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; }
+    .options-grid { display: grid; grid-template-columns: 1fr; gap: 10px; margin-top: 10px; }
+    @media(min-width: 600px) { .options-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); } }
+    .option-card { padding: 15px; border: 2px solid #e0e0e0; border-radius: 10px; text-align: center; cursor: pointer; transition: 0.2s; background: white; display: flex; align-items: center; justify-content: center; min-height: 60px; }
+    .option-card.selected { border-color: #21808d; background: #f0f9fa; color: #134252; font-weight: 700; }
+    .option-card input { display: none; }
+    .muscle-selector { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 10px; }
+    .muscle-item { padding: 8px; border: 2px solid #e0e0e0; border-radius: 8px; cursor: pointer; background: white; text-align: center; font-size: 12px; }
+    .muscle-item.selected { border-color: #21808d; background: #21808d; color: white; }
+    .muscle-item input { display: none; }
+    .btn { width: 100%; padding: 16px; border: none; border-radius: 10px; font-size: 16px; font-weight: 600; cursor: pointer; margin-top: 10px; }
+    .btn-primary { background: #21808d; color: white; }
+    .btn-secondary { background: #f5f5f5; color: #333; margin-top: 0; }
+    .nav-buttons { display: flex; gap: 10px; margin-top: 30px; }
+    .price-box { background: #f0f9fa; border: 2px solid #21808d; border-radius: 15px; padding: 20px; margin: 20px 0; }
+    .price-row { display: flex; justify-content: space-between; padding: 8px 0; font-size: 14px; }
+    .price-total { border-top: 2px solid #21808d; margin-top: 10px; padding-top: 10px; font-weight: 700; color: #21808d; font-size: 18px; }
+    .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 999; align-items: center; justify-content: center; }
+    .modal.show { display: flex; }
+    .modal-content { background: white; width: 95%; max-width: 600px; max-height: 90vh; overflow-y: auto; padding: 20px; border-radius: 15px; }
+    .msg { padding: 10px; border-radius: 5px; margin: 10px 0; text-align: center; display: none; }
+    .msg.err { background: #ffebee; color: #c62828; } .msg.ok { background: #e8f5e9; color: #2e7d32; }
+    .loader { display: inline-block; width: 15px; height: 15px; border: 2px solid rgba(255,255,255,0.5); border-radius: 50%; border-top-color: #fff; animation: spin 1s linear infinite; margin-right: 5px; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <div class="header">
+    <button class="admin-btn" onclick="toggleAdmin()">⚙️</button>
+    <h1>ElCientifitness</h1>
+    <p>Registro de Clientes</p>
+  </div>
+
+  <div class="content">
+    <div id="appMsg" class="msg"></div>
+    
+    <div class="progress-bar">
+      <div class="progress-fill" id="pFill" style="width: 0%"></div>
+      <div class="step active" id="s1">1</div><div class="step" id="s2">2</div>
+      <div class="step" id="s3">3</div><div class="step" id="s4">4</div><div class="step" id="s5">5</div>
+    </div>
+
+    <div class="form-section active" id="sec1">
+      <h2 class="section-title">Datos Personales</h2>
+      <div class="form-group"><label class="form-label">Nombre</label><input type="text" class="form-input" id="nombre"></div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Email</label><input type="email" class="form-input" id="email"></div>
+        <div class="form-group"><label class="form-label">Teléfono</label><input type="tel" class="form-input" id="telefono"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Edad</label><input type="number" class="form-input" id="edad"></div>
+        <div class="form-group"><label class="form-label">Peso (kg)</label><input type="number" class="form-input" id="peso"></div>
+        <div class="form-group"><label class="form-label">Altura (cm)</label><input type="number" class="form-input" id="altura"></div>
+      </div>
+    </div>
+
+    <div class="form-section" id="sec2">
+      <h2 class="section-title">Objetivos</h2>
+      <div class="options-grid" id="optObjetivos">
+        </div>
+      <div class="form-group" style="margin-top:20px"><label class="form-label">Detalles específicos</label><textarea class="form-input" id="objEsp" rows="3"></textarea></div>
+      <label class="form-label">Músculos (Foco)</label>
+      <div class="muscle-selector" id="muscles">
+        </div>
+    </div>
+
+    <div class="form-section" id="sec3">
+      <h2 class="section-title">Disponibilidad</h2>
+      <div class="form-group"><label class="form-label">Días/Semana</label><select class="form-input" id="dias"><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option></select></div>
+      <div class="form-group"><label class="form-label">Horas/Día</label><select class="form-input" id="horas"><option>1</option><option>1.5</option><option>2</option><option>3</option></select></div>
+    </div>
+
+    <div class="form-section" id="sec4">
+      <h2 class="section-title">Experiencia</h2>
+      <div class="form-group"><label class="form-label">Historia/Lesiones</label><textarea class="form-input" id="expDesc" rows="4"></textarea></div>
+      <div class="form-group"><label class="form-label">Tiempo entrenando</label><select class="form-input" id="expDur"><option>Principiante</option><option>Intermedio</option><option>Avanzado</option></select></div>
+    </div>
+
+    <div class="form-section" id="sec5">
+      <h2 class="section-title">Tu Plan</h2>
+      <div class="price-box">
+        <h3 id="planTitle" style="color:#21808d; margin-bottom:10px">Plan Base</h3>
+        <label class="form-label">Duración</label>
+        <div class="options-grid" style="grid-template-columns: repeat(3,1fr); margin-bottom:15px">
+          <label class="option-card" onclick="setDur('1')"><input type="radio" name="d" value="1">1 Mes</label>
+          <label class="option-card" onclick="setDur('3')"><input type="radio" name="d" value="3">3 Meses</label>
+          <label class="option-card" onclick="setDur('6')"><input type="radio" name="d" value="6">6 Meses</label>
+        </div>
+        <label class="form-label">Nutrición</label>
+        <div class="options-grid" id="optNutri" style="margin-bottom:15px"></div>
+        
+        <div style="display:flex; gap:10px; margin-bottom:10px">
+          <input type="text" class="form-input" id="cod" placeholder="Código Descuento">
+          <button class="btn btn-primary" onclick="checkCode()" style="width:auto; margin:0">Aplicar</button>
+        </div>
+        <div id="msgCode" style="font-size:12px; margin-bottom:10px"></div>
+
+        <div class="price-row"><span>Asesoría:</span><span id="pAses">0€</span></div>
+        <div class="price-row"><span>Nutrición:</span><span id="pNut">0€</span></div>
+        <div class="price-row" id="rowDesc" style="color:#e65100; display:none"><span>Descuento:</span><span id="pDesc">-0€</span></div>
+        <div class="price-row price-total"><span>TOTAL:</span><span id="pTotal">0€</span></div>
+      </div>
+    </div>
+
+    <div class="form-section" id="secSuccess" style="text-align:center">
+      <h2 style="color:#21808d; font-size:40px">✅</h2>
+      <h2 class="section-title">¡Recibido!</h2>
+      <p>Revisa tu email (y spam) en unos minutos.</p>
+      <button class="btn btn-primary" onclick="location.reload()">Nuevo</button>
+    </div>
+
+    <div class="nav-buttons" id="navBtns">
+      <button class="btn btn-secondary" onclick="move(-1)" id="btnBack" style="display:none">Atrás</button>
+      <button class="btn btn-primary" onclick="move(1)" id="btnNext">Siguiente</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="modalAdmin">
+  <div class="modal-content">
+    <div style="display:flex; justify-content:space-between"><h3>Admin</h3><span onclick="toggleAdmin()" style="font-size:24px; cursor:pointer">&times;</span></div>
+    <input type="password" class="form-input" id="admPass" placeholder="Contraseña" style="margin:10px 0">
+    <div style="border-top:1px solid #eee; padding-top:10px; margin-top:10px">
+      <h4>Actualizar Precios</h4>
+      <p style="font-size:12px; color:#666">Edita los precios en el Excel directamente o usa este botón para recargar la caché si fuera necesario.</p>
+      <button class="btn btn-primary" onclick="alert('Usa el Excel para editar precios de forma más segura.')">Ir al Excel</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ==========================================
+// PEGA AQUÍ LA URL QUE COPIASTE EN EL PASO 1
+// ==========================================
+const API_URL = 'https://script.google.com/macros/s/AKfycbyOaNtd4DXNpZzPCZrRcST_aHZpcKlg-hGd2-WsT1H_Nj_5Z-i7-GeLuAre5kzrGvtvVg/exec'; 
+// ==========================================
+
+let step = 1;
+let data = { asesorias: {}, nutricion: [] };
+let selObj = '', selDur = '', selNut = null, desc = null;
+
+// INIT
+window.onload = async () => {
+  renderOpts();
+  try {
+    const res = await fetch(API_URL + '?action=getPrecios');
+    const json = await res.json();
+    data = json;
+    renderNutri();
+  } catch(e) { console.log(e); }
+};
+
+// UI RENDERING
+function renderOpts() {
+  const objs = ['ESTÉTICA','CULTURISMO','SALUD','POWERLIFTING','CROSSFIT','HYROX','RESISTENCIA'];
+  const muscles = ['Pectoral','Espalda','Pierna','Hombro','Brazo','Abdomen','Glúteo'];
+  
+  document.getElementById('optObjetivos').innerHTML = objs.map(o => 
+    `<label class="option-card" onclick="setObj('${o}', this)"><input type="radio" name="o" value="${o}">${o}</label>`
+  ).join('');
+  
+  document.getElementById('muscles').innerHTML = muscles.map(m => 
+    `<label class="muscle-item" onclick="this.classList.toggle('selected')"><input type="checkbox" value="${m}">${m}</label>`
+  ).join('');
+}
+
+function renderNutri() {
+  let h = `<label class="option-card selected" onclick="setNut(null, this)"><input type="radio" name="n" checked>No</label>`;
+  if(data.nutricion) {
+    h += data.nutricion.map(n => 
+      `<label class="option-card" onclick="setNut('${n.nombre}', this)"><input type="radio" name="n">${n.nombre}</label>`
+    ).join('');
+  }
+  document.getElementById('optNutri').innerHTML = h;
+}
+
+// LOGIC
+function setObj(v, el) { selObj = v; selectCard(el, 'optObjetivos'); document.getElementById('planTitle').innerText = v; calc(); }
+function setDur(v) { selDur = v; document.querySelectorAll('input[name="d"]').forEach(i=>i.closest('label').classList.remove('selected')); event.target.closest('label').classList.add('selected'); calc(); }
+function setNut(v, el) { selNut = v ? data.nutricion.find(n=>n.nombre===v) : null; selectCard(el, 'optNutri'); calc(); }
+
+function selectCard(el, parentId) {
+  document.getElementById(parentId).querySelectorAll('.option-card').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+  el.querySelector('input').checked = true;
+}
+
+function calc() {
+  if(!selObj || !selDur) return;
+  const pA = data.asesorias[selObj]?.[selDur] || 0;
+  const pN = selNut ? selNut.precios[selDur] : 0;
+  let total = pA + pN;
+  
+  document.getElementById('pAses').innerText = pA + '€';
+  document.getElementById('pNut').innerText = pN + '€';
+  
+  let dVal = 0;
+  if(desc) {
+    dVal = desc.tipo === 'porcentaje' ? total * (desc.valor/100) : desc.valor;
+    document.getElementById('rowDesc').style.display = 'flex';
+    document.getElementById('pDesc').innerText = '-' + dVal.toFixed(2) + '€';
+  }
+  document.getElementById('pTotal').innerText = (total - dVal).toFixed(2) + '€';
+}
+
+async function checkCode() {
+  const c = document.getElementById('cod').value;
+  if(!c) return;
+  const btn = event.target; btn.innerText = '...';
+  const res = await fetch(API_URL, {
+    method: 'POST',
+    body: JSON.stringify({action:'validarCodigo', codigo:c})
+  });
+  const j = await res.json();
+  btn.innerText = 'Aplicar';
+  const m = document.getElementById('msgCode');
+  if(j.valido) { desc = j; m.style.color='green'; m.innerText=j.mensaje; calc(); }
+  else { desc = null; m.style.color='red'; m.innerText='Código inválido'; calc(); }
+}
+
+// NAVIGATION
+async function move(d) {
+  if(d === 1 && !validate()) return;
+  if(d === 1 && step === 5) { await submit(); return; }
+  
+  document.getElementById('sec'+step).classList.remove('active');
+  document.getElementById('s'+step).classList.remove('active'); if(d===1) document.getElementById('s'+step).classList.add('completed');
+  step += d;
+  document.getElementById('sec'+step).classList.add('active');
+  document.getElementById('s'+step).classList.add('active');
+  
+  document.getElementById('pFill').style.width = ((step-1)/4)*100 + '%';
+  document.getElementById('btnBack').style.display = step > 1 ? 'block' : 'none';
+  document.getElementById('btnNext').innerText = step === 5 ? 'Confirmar y Enviar' : 'Siguiente';
+  window.scrollTo(0,0);
+}
+
+function validate() {
+  const v = (id) => document.getElementById(id).value;
+  if(step===1 && (!v('nombre') || !v('email') || !v('telefono'))) return alert('Faltan datos');
+  if(step===2 && !selObj) return alert('Elige un objetivo');
+  if(step===5 && !selDur) return alert('Elige duración');
+  return true;
+}
+
+async function submit() {
+  const btn = document.getElementById('btnNext');
+  btn.disabled = true; btn.innerHTML = '<span class="loader"></span> Enviando...';
+  
+  const payload = {
+    nombre: document.getElementById('nombre').value,
+    email: document.getElementById('email').value,
+    telefono: document.getElementById('telefono').value,
+    edad: document.getElementById('edad').value,
+    peso: document.getElementById('peso').value,
+    altura: document.getElementById('altura').value,
+    objetivo: selObj,
+    objetivosEspecificos: document.getElementById('objEsp').value,
+    diasSemana: document.getElementById('dias').value,
+    horasDia: document.getElementById('horas').value,
+    experienciaDescripcion: document.getElementById('expDesc').value,
+    experienciaDuracion: document.getElementById('expDur').value,
+    duracionPlan: selDur,
+    tipoNutricion: selNut ? selNut.nombre : '',
+    // Nota: El precio final se recalcula en backend por seguridad, enviamos base para ref
+    precioFinal: document.getElementById('pTotal').innerText
+  };
+  
+  try {
+    await fetch(API_URL, { method: 'POST', body: JSON.stringify({action:'nuevoRegistro', datos:payload}) });
+    document.getElementById('sec5').classList.remove('active');
+    document.getElementById('secSuccess').classList.add('active');
+    document.getElementById('navBtns').style.display = 'none';
+  } catch(e) {
+    alert('Error enviando. Intenta de nuevo.');
+    btn.disabled = false; btn.innerText = 'Confirmar y Enviar';
+  }
+}
+
+function toggleAdmin() {
+  const m = document.getElementById('modalAdmin');
+  m.classList.toggle('show');
+}
+</script>
+</body>
+</html>
