@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>ElCientifitness</title>
+  <title>ElCientifitness - Registro</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     /* ESTILOS VISUALES */
@@ -161,7 +161,7 @@
 
 <script>
 // ==========================================
-// PEGA AQUÍ LA URL QUE COPIASTE EN EL PASO 1
+// TU URL DE GOOGLE APPS SCRIPT:
 // ==========================================
 const API_URL = 'https://script.google.com/macros/s/AKfycbyOaNtd4DXNpZzPCZrRcST_aHZpcKlg-hGd2-WsT1H_Nj_5Z-i7-GeLuAre5kzrGvtvVg/exec'; 
 // ==========================================
@@ -293,7 +293,6 @@ async function submit() {
     experienciaDuracion: document.getElementById('expDur').value,
     duracionPlan: selDur,
     tipoNutricion: selNut ? selNut.nombre : '',
-    // Nota: El precio final se recalcula en backend por seguridad, enviamos base para ref
     precioFinal: document.getElementById('pTotal').innerText
   };
   
